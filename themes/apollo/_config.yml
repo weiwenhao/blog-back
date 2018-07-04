@@ -1,0 +1,20 @@
+menu:
+    Blog: /
+    Archive: /archives/
+    # Weibo: http://weibo.com/sunchongsheng
+    GitHub: https://github.com/green-lizard
+    Rss: /atom.xml
+
+favicon: /favicon.ico
+logo: /logo.png
+
+# e.g disqus: seansun
+disqus: maxwei
+duoshuo:
+
+# Analytics
+# google-analytics:
+ga: UA-113144905-1
+
+# Copyright Infomation
+startyear: 2017
