@@ -1,6 +1,6 @@
 ---
 title: 过程抽象解一般方程
-date: 2018-01-27 17:00:03
+date: 2018-09-21 10:06:45
 tags:
 ---
 
@@ -8,6 +8,7 @@ tags:
 <!-- more -->
 
 ## 传统解方程
+
 
 
 #### 二次函数为例
@@ -32,7 +33,7 @@ tags:
 
 对`ax² + bx + c = 0 (a ≠ 0)`它的根可以表示为：
 
-![x_{{1,2}}={\frac  {-b\pm {\sqrt  {b^{2}-4ac\ }}}{2a}}.](https://wikimedia.org/api/rest_v1/media/math/render/svg/ddcdc99b985b5d370851854c27f1e803c29ebd6a)
+![img](https://wikimedia.org/api/rest_v1/media/math/render/svg/ddcdc99b985b5d370851854c27f1e803c29ebd6a)
 
 
 
@@ -158,5 +159,7 @@ x² = y.  转换一下可以得到 x = y/x. 现在只要找到一个x使得 x = 
 
 
 successful!
+
+
 
 将过程作为参数传递,能够显著增强我们的程序设计语言的表达能力.可以表述计算的一般性过程,与其中所涉及的特定函数无关.
