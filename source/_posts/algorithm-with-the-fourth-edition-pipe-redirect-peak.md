@@ -18,13 +18,13 @@ tags:
 - 搭建一个可以执行的eclipse环境(配置javahome,classpath等环境变量), 需要引入官方提供的algs4.jar. [点击下载 algs4.jar][1]
 
 - myEclipse2017(其他的包括eclipse应该也是类似的)
-![](http://omjq5ny0e.bkt.clouddn.com/17-5-29/18116468.jpg)
+![](http://asset.eienao.com/17-5-29/18116468.jpg)
 
-![](http://omjq5ny0e.bkt.clouddn.com/17-5-29/27315029.jpg)
+![](http://asset.eienao.com/17-5-29/27315029.jpg)
 
 - 引入完毕后的project目录结构
 
-![](http://omjq5ny0e.bkt.clouddn.com/17-5-29/75569768.jpg)
+![](http://asset.eienao.com/17-5-29/75569768.jpg)
 
 - 代码示例(可测试)
 RandomSeq.java 输出随机数

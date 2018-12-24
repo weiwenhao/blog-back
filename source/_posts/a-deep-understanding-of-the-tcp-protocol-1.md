@@ -15,14 +15,14 @@ tags:
 4. 客户必须确认服务器的SYN。既发送一个确认SYN的ACK。
 
 这种交换至少需要3个分组,因此称之为TCP的三路握手(thre-way handshake)。
-![](http://omjq5ny0e.bkt.clouddn.com/15175486060759.jpg)
+![](http://asset.eienao.com/15175486060759.jpg)
 
 可以看到服务端调用accept()函数后，一直处于阻塞状态。直到三路握手完成后，accept函数才返回。然后再阻塞于read状态
 
 ## TCP状态转换图
 TCP为一个连接定义了11种状态
  
-![](http://omjq5ny0e.bkt.clouddn.com/15179303680473.jpg)
+![](http://asset.eienao.com/15179303680473.jpg)
 
 其中ESTABLISHED为（客户端或服务端）完成三路握手后的状态，这个最终状态在数据发送期间一直保持。
 
@@ -38,14 +38,14 @@ TIME_WAIT状态有两个存在的理由：
 
 
 
-![](http://omjq5ny0e.bkt.clouddn.com/15179304017422.jpg)
+![](http://asset.eienao.com/15179304017422.jpg)
 
 
 上图服务器对客户的请求的确认是伴随其应答发送的,这种做法称为 piggybacking，
 它通常在服务器请求并产生的应答的时间少于200ms时发生。
 
 ## 并发服务器
-![](http://omjq5ny0e.bkt.clouddn.com/15181013775313.jpg)
+![](http://asset.eienao.com/15181013775313.jpg)
 如图为一个多进程模型的并发服务器
 
 我们发现子进程1和子进程2的connect_socket甚至是listen_socket都使用了服务器端的21端口。
@@ -57,7 +57,7 @@ TIME_WAIT状态有两个存在的理由：
 **书（unix网络编程卷3）中的解释是：**  TCP协议必须查看**套接字对**的所有四个元素，才能确定由哪个socket接受到达的客户端请求。
 
 > 对于tcp请求，我们可以在分节的tcp标头中得到这四个元素（请求双方的id和端口号）
-![](http://omjq5ny0e.bkt.clouddn.com/15181892735181.jpg)
+![](http://asset.eienao.com/15181892735181.jpg)
 
 
 **下面是我根据书中的解释做出的臆想**

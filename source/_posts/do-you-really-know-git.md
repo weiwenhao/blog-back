@@ -36,7 +36,7 @@ nothing to commit, working tree clean
 这是阮一峰大神一篇博客中看到的git操作示意图
 > 网上流传的大部分资料都类似这样
 
-![](http://omjq5ny0e.bkt.clouddn.com/15231690297894.jpg)
+![](http://asset.eienao.com/15231690297894.jpg)
 
 通过这幅图，我理所当然的认为在队友push之后，我执行git status命令会提示`Your branch is behind`
 我相信很多人都是这么认为的。
@@ -56,12 +56,12 @@ nothing to commit, working tree clean
 ### 没有远程仓库时，我们常执行的命令有两条
 
 `git add`和`git commit` 通过这两条命令绘制出如下图像
-![](http://omjq5ny0e.bkt.clouddn.com/15231725127941.jpg)
+![](http://asset.eienao.com/15231725127941.jpg)
 
 
 ### 当关联远程仓库后，得到如下示意图
 
-![](http://omjq5ny0e.bkt.clouddn.com/15231740463034.jpg)
+![](http://asset.eienao.com/15231740463034.jpg)
 
 这张图是我根据git命令的一些行为得到，非权威。和上面阮一峰的示意图相比，本地增加了一个 origin/master。
 

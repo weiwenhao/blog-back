@@ -54,13 +54,13 @@ LANGUAGE="zh_CN.UTF-8"
 我添加的普通用户名为 weiwenhao 后面看到文件中含有该名字的请自行脑补替换为自己添加的普通用户名
 
 1. `$ adduser newusername` 添加新用户， 下面是我在网上找来的中文翻译
-    ![](http://omjq5ny0e.bkt.clouddn.com/17-6-3/81936607.jpg)
+    ![](http://asset.eienao.com/17-6-3/81936607.jpg)
 
 2. 给新用户添加root的权限。  该步骤可以使普通用户使用如  sudo service ...类似的命令。
     - `$ chmod g+w /etc/sudoers` 给该文件写权限
   
     - `$ vim /etc/sudoers` 打开添加如图所示后保存退出
-        ![](http://omjq5ny0e.bkt.clouddn.com/17-6-3/49855517.jpg)
+        ![](http://asset.eienao.com/17-6-3/49855517.jpg)
     
     - `$ chmod g-w /etc/sudoers` 去除该文件的写权限
 
@@ -150,7 +150,7 @@ cgi.fix_pathinfo=0
     - 这里一个server{}为一个站点，所以多站点自行复制一份server{}并配置即可
  
 - 修改nginx限制post表单上传大小 `vim /etc/nginx/nginx.conf`打开nginx配置,在http{}中添加下面标注的一行
-    ![](http://omjq5ny0e.bkt.clouddn.com/17-6-4/83464492.jpg)
+    ![](http://asset.eienao.com/17-6-4/83464492.jpg)
 - `$ service nginx restart`重启nginx
 
 ### 安装redis `$ apt install redis-server`
@@ -202,7 +202,7 @@ cgi.fix_pathinfo=0
 
 - `$ sudo vim /etc/crontab` 
 
-![](http://omjq5ny0e.bkt.clouddn.com/17-6-3/92337477.jpg)
+![](http://asset.eienao.com/17-6-3/92337477.jpg)
 
 - `$ sudo service cron restart`重启cron
 

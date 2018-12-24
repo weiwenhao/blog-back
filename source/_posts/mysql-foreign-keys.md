@@ -14,7 +14,7 @@ tags: mysql
 ## 语法
 
 
-![](http://omjq5ny0e.bkt.clouddn.com/17-3-18/93322072-file_1489851435340_66c1.png)
+![](http://asset.eienao.com/17-3-18/93322072-file_1489851435340_66c1.png)
 
 定义为 `foreign_key`的字段所在的表称为 **从表**，也叫做被约束的表，反之，`references` 参考的字段（必须为主键，或者唯一索引）所在的表称为**主表**，即约束表
         
