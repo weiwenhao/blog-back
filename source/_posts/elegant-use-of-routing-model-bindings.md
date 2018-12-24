@@ -1,159 +1,183 @@
 ---
-title: 简述 container —— 反射机制实现
-date: 2018-01-27 17:00:03
-tags:
+title: 优雅的使用路由模型绑定
+date: 2018-09-21 15:44:20
+tags: laravel api
 ---
 
+## Basic
+
+> laravel5.1/5.2发布的路由模型绑定是一个非常强大的功能,dingo/api中想要使用路由模型绑定需要引入bindings组件到dingo的路由组中
 
 <!-- more -->
 
+#### 路由中的参数命名
 
-## 前言
+如有需要,使用资源的单数形式为路由命名,而不是 {id}/{slug}/{code}等等
 
-> 使用依赖注入实现控制反转来降低代码的耦合性。
-
-依赖注入 DI，控制反转 IOC，解耦等等等 大家探索前进，终走到了这一步,终于让代码灵活、可扩展、低耦合、高内聚，终于可以开心的coding了!!
-
-好，现在我要去数据库中查询用户id为1的用户名。
+正确的示例
 
 ```php
+# api.php
 
-new User(
-    new \Database\MysqlDrive(new \Database\Connection),
-    new Builder(),
-    new Relations(),
-    new Event(new Listener()),
-    new Auth(),
-    ...
-)
-
-stop？我好像有点写不完，我只想获取一个用户名而已！！！
+Route::resource('posts', 'PostController'); // laravel会将参数命名为 post
+Route::get('users/{user}/posts', 'PostController@index');
+Route::get('posts/{post}/comments', 'CommentController@index');
 ```
 
 
-当我使用依赖注入后，所有的依赖都由调用者来处理， 调用者可以控制User的行为，但却要做更多的事情。
 
-但我不想多做一丝事情，我希望更加简单，简单到连依赖也能自动处理，解析，自动注入该有多好呀！
+#### 显式绑定
 
-> 题外话：我所理解的最为灵活的php开发架构是，php作为一个中转，将前端和mysql连接起来。这样我们就可以灵活到一套代码解决所有所有的问题了。
-> 例如`http://web.dev/users/1?fields=id,username&include=posts:limit(1|5):order(created_at|desc)`
-
-
-## 示例代码
-
-我现在有一个Foo类，Foo类中一个`allBarName()`方法.并且依赖于BarA~BarD这4个类的name()方法. 如下 
+以[简书](https://www.jianshu.com/)的文章为例,使用RESTFul 风格可以得到以下几条路由
 
 ```php
-<?php
+# api.php
 
-namespace Container\Foo;
+Route::get('posts', 'PostController@index'); // 首页/基础帖子展示
+Route::get('users/{user}/posts', 'PostController@index'); // 某个用户的帖子
+Route::get('collections/{collections}/posts', 'PostController@index') // 某个专题下的帖子
+```
 
-use Container\Bar\BarA;
-use Container\Bar\BarB;
-use Container\Bar\BarC;
-use Container\Bar\BarD;
 
-class Foo
+
+可以看到,这里我使用了同一个方法来处理这三条路由.
+
+接下来定义路由模型绑定,这里使用显式绑定,以获得较大的灵活性
+
+```php
+# RouteServiceProvider.php
+
+Route::model('user', User::class);
+Route::model('collection', Collection::class)
+```
+
+
+
+然后看看控制器中的定义
+
+```php
+# PostController.php
+
+public function index($parent = null)
 {
-    private $barA;
-    private $barB;
-    private $barC;
-    private $barD;
+    $query = $parent ? $parent->posts() : Post::query();
 
-    public function __construct(BarA $barA, BarB $barB, BarC $barC, BarD $barD)
-    {
+    // e.g
+    $posts = $query->latest()->paginate();
 
-        $this->barA = $barA;
-        $this->barB = $barB;
-        $this->barC = $barC;
-        $this->barD = $barD;
-    }
+    // ...
+}
+```
 
-    public function allBarName()
-    {
-        return $this->barA->name().'/'.$this->barB->name().'/'.$this->barC->name().'/'.$this->barD->name();
-    }
+
+
+当我们使用第一条路由访问我们的帖子时, $parent得到的是一个null, `$query = Post::query`.
+
+访问后两条路由时,由于路由模型绑定,$parent 被赋值为具体的model. 此时可以通过model中定义的关联关系来获取query. 通过显示绑定和关联关系的定义,使得$parent->posts()足够抽象,不依赖于具体的model.具有强大的通用性.
+
+
+
+#### p.s 
+
+```php
+# User.php
+ 
+public function posts()
+{
+    return $this->hasMany(Post::class);
 }
 
 ```
 
-BarA示例， BarB，BarC，BarD相同
-
 ```php
-<?php
+# Collection.php
 
-namespace Container\Bar;
-
-class BarA
+public function posts()
 {
-    public function name()
-    {
-        return '彼得·帕克';
-    }
-}
-
-```
-
-现在用依赖注入的方式来，调用`allBarName()`方法。
-
-```php
-$foo = new \Container\Foo\Foo(
-    new \Container\Bar\BarA(),
-    new \Container\Bar\BarB(),
-    new \Container\Bar\BarC(),
-    new \Container\Bar\BarD()
-);
-
-echo $foo->allBarName(); // 彼得·帕克/托尼·屎大颗/巴里·艾伦/布鲁斯·韦恩
-
-```
-上面的code已经是低耦合的了。
-但懒惰的我并不想去手动注入Foo的所有依赖，我希望能有一个Container来帮我解析Foo的所有依赖，然后再把实例返回给我。
-
-那就来吧，实现一个简单的Container
-
-```php
-<?php
-
-namespace Container;
-
-class Container
-{
-    public static function make($class)
-    {
-        $reflection = new \ReflectionClass($class);
-
-        $constructor = $reflection->getConstructor();
-        $parameters = $constructor->getParameters();
-
-        $instances = [];
-
-        foreach ($parameters as $parameter) {
-            $className =  $parameter->getClass()->getName();
-            $instances[] = new $className;
-        }
-
-        //... 将数组拆封成参数传递给方法, 类似于 call_user_func_array()
-        return new $class(...$instances);
-    }
+    return $this->belongsToMany(Post::class, 'collection_post');
 }
 ```
 
-这是一个简单到不能再简单的依赖解析容器了，但我想它能满足我的需求。
 
-再次调用allBarName()方法
+
+## Advance
+
+对于, 如 我的文章列表,我的订单等我们可能会这样定义我们的 RESTFul 路由
 
 ```php
-$foo = \Container\Container::make(\Container\Foo\Foo::class);
-echo $foo->allBarName(); // 彼得·帕克/托尼·屎大颗/巴里·艾伦/布鲁斯·韦恩
+// 这里单数形式的user就代表着me的意思, 参考于github api
+Route::get('user/posts', 'PostController@index');
+Route::get('user/orders', 'OrderController@index');
 ```
-oh yeah！成功了
 
 
-## 结语
 
-我想我已经表达了我的想法，我还没有能力也不是很想去实现一个强大灵活的container，能够知道为什么需要container我已经很满足了。
+甚至,依旧已简书为例,简书有两个板块[30日热门](https://www.jianshu.com/trending/weekly?utm_medium=index-banner-s&utm_source=desktop)和[7日热门](https://www.jianshu.com/trending/monthly?utm_medium=index-banner-s&utm_source=desktop), 我们可能会有这样两条路由
 
-- code demo [https://github.com/weiwenhao/container](https://github.com/weiwenhao/container)
+```php
+Route::get('hot-30/posts', 'PostController@index');
+Route::get('hot-7/posts', 'PostController@index');
+
+// 又或者根据推荐算法通过用户画像推荐不同的文章
+Route::get('recommend/posts', 'PostController@index');
+```
+
+> 不要激动,接下来不是算法环节?
+
+?现在的问题是,如何依旧使用同一个方法实现?的几条路由呢?
+
+**我们换一种思路.前面我们都是在控制器层面做抽象,然后把具体逻辑交给路由层.可面对上面的需求依旧有些力不从心,那我们不妨寻找一下上面需求的共同点,再提取一层抽象**
+
+> 当然更简单的思路是 拆开几个方法写就ok啦,搞这么麻烦是吧.见仁见智.瞎折腾就是了
+
+我们可以这么做
+
+```php
+# api.php
+
+// 使用 {virtual} 来匹配上面的hot-30,hot-7,recommend 等等
+Route::get('{virtual}/posts', 'PostController@index'); 
+```
+
+
+
+```php
+# RouteServiceProvider.php
+
+Route::bind('virtual', function ($value) {
+    $virtual = "App\\Virtual\\" . studly_case($value);
+    return new $virtual($value);
+});
+```
+
+上面的做法是, 路由模型绑定是基于model,或者说 entity 的*(在symfony中model被称作entity)*.但是hot-30/hot-7/recommend 并不基于model.*(当然也可以基于model,不过这不是我们本次讨论的重点)*, 
+
+那我们不妨使用一个virtual 来承载它们, virtual是一个和entity相近又相反的意思.在这里再适合不过了.来看看具体实现
+
+```php
+# Hot30.php
+
+namespace App\Virtual;
+
+use App\Models\Post;
+
+class Hot30 extends Virtual
+{
+    public function posts()
+    {
+        $ids = ...; // service
+        return Post::whereIn('id', $ids);
+    }
+}
+```
+
+Hot7,Recommend同理. 这样我们又承接起了上面控制器的代码.这里的posts()的作用就相当于比如User.php中的posts()的作用,但是却更加的灵活.
+
+> 鲁迅说过: 不要害怕在你的app下添加目录
+
+
+我只是分享了一个简单的想法,更多的用法等着你来探索.
+
+successful!
 
 
